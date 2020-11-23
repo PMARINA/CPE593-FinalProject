@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# docs that aren't relevant
+docs/*.*
+docs/Makefile
+!docs/*.pdf
+!docs/*.tex
