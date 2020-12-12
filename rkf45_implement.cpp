@@ -1,5 +1,6 @@
 #include <iostream>
 #include <bits/stdc++.h>
+#include <cmath>
 
 using std::cout;
 using std::endl;
@@ -23,29 +24,65 @@ using std::endl;
         END LOOP.
 */
 
+//Equations used internally within the integral estimates.
+
 double RKF45k1(double &timestep, double &deriv) {
     return (timestep * deriv);
 };
 double RKF45k2(double &timestep, double &deriv, double &initialValue) {
     double timestep_new = (.25*timestep);
     double deriv_est = ((.25*RKF45k1(timestep_new, deriv)));
-    return (timestep * EulerEstimate(timestep_new, deriv_est, initialValue));
+    return (initialValue + deriv_est);
 };
 double RKF45k3(double &timestep, double &deriv, double &initialValue) {
     double timestep_new = ((3.0/8.0)*timestep);
-    double deriv_est = ((3.0/32.0)*RKF45k1(timestep_new, deriv))+((9.0/32.0)*RKF45k2(timestep_new, deriv, initialValue));
-   return (timestep * EulerEstimate(timestep_new, deriv_est, initialValue));
+    double deriv_est = ((3.0/32.0)*RKF45k1(timestep_new, deriv))
+        +((9.0/32.0)*RKF45k2(timestep_new, deriv, initialValue));
+    return (initialValue + deriv_est);
 };
 double RKF45k4(double &timestep, double &deriv, double &initialValue) {
-    
+    double timestep_new = ((12.0/13.0)*timestep);
+    double deriv_est = ((1932.0/2197.0)*RKF45k1(timestep_new, deriv))
+        -((7200.0/2197.0)*RKF45k2(timestep_new, deriv, initialValue)) 
+        +((7296.0/2197.0)*RKF45k3(timestep_new, deriv, initialValue));
+    return (initialValue + deriv_est);
 };
-double RKF45k5(double &timestep, double &deriv, double &initialValue);
-double RKF45k6(double &timestep, double &deriv, double &initialValue);
-
-double EulerEstimate(double &timestep, double &deriv, double &initialValue) {
-    return (initialValue + (timestep * deriv));
+double RKF45k5(double &timestep, double &deriv, double &initialValue) {
+    double deriv_est = ((439.0/216.0)*RKF45k1(timestep, deriv))-(8.0*RKF45k2(timestep, deriv, initialValue))
+        +((3680.0/513.0)*RKF45k3(timestep, deriv, initialValue))
+        -((845.0/4104.0)*RKF45k4(timestep, deriv, initialValue));
+    return (initialValue + deriv_est);
+};
+double RKF45k6(double &timestep, double &deriv, double &initialValue) {
+    double timestep_new = .5*timestep;
+    double deriv_est = ((-8.0/27.0)*RKF45k1(timestep_new, deriv))+(2.0*RKF45k2(timestep_new, deriv, initialValue))
+        -((3544.0/2565.0)*RKF45k3(timestep_new, deriv, initialValue))
+        +((18959.0/4104.0)*RKF45k4(timestep_new, deriv, initialValue))
+        -((11.0/40.0)*RKF45k5(timestep_new, deriv, initialValue));
 };
 
-double RKF45IntegralEstimate(double &timestep, double &deriv, double &initialValue) {
+//The integral estimates themselves.
 
-}
+void RKF45_integral_estimate_fourth_order(double &timestep, double &deriv, double &initial_value, double &return_result_to) {
+    return_result_to = (initial_value+((25.0/216.0)*RKF45k1(timestep, deriv))+((1408.0/2565.0)
+        *RKF45k3(timestep, deriv, initial_value))+((2197.0/4104.0)*RKF45k4(timestep, deriv, initial_value))
+        -(.2*RKF45k5(timestep, deriv, initial_value)));
+};
+
+void RKF45_integral_estimate_fifth_order(double &timestep, double &deriv, 
+    double &initial_value, double &return_result_to) {
+        return_result_to = (initial_value+((16.0/135.0)*RKF45k1(timestep, deriv))+((6656.0/12825.0)
+            *RKF45k3(timestep, deriv, initial_value))+((28561.0/56430.0)*RKF45k4(timestep, deriv, initial_value))
+            -(.18*RKF45k5(timestep, deriv, initial_value))+((22.0/55.0)*RKF45k6(timestep, deriv, initial_value)));
+};
+
+//Function to return adaptive timestep coefficient.
+
+void RKF45_fifth_order_timestep_coefficient(double &timestep, double &deriv, 
+    double &initial_value, double &tolerance, double &return_coefficient_to) {
+        double error, fifth, fourth;
+        RKF45_integral_estimate_fifth_order(timestep, deriv, initial_value, fifth);
+        RKF45_integral_estimate_fourth_order(timestep, deriv, initial_value, fifth);
+        error = fifth - fourth;
+        return_coefficient_to = pow((tolerance*timestep)/(2*abs(error)), 0.25);
+};
