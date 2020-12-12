@@ -1,4 +1,4 @@
-//this is not to be used in the final program because we are using RK45
+//this is not to be used in the final program because we are using RKF45
 //the purpose is to familiarize with the concept of a predictor corrector in practice
 
 //example equation: dy/dx = 4.4x^3 - 2y^2
