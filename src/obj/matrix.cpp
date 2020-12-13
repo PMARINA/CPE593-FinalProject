@@ -13,18 +13,20 @@ using std::endl;
 using std::string;
 class Matrix {
 private:
-    double* data;
     uint64_t timesteps_stored;
     uint64_t dims;
-    uint64_t get_offset(const uint64_t& dimension, const uint64_t index){
-        return dimension*dims + index;
-    }
     uint64_t* get_dim_index(const uint64_t& offset){
         uint64_t* dim_arr = new uint64_t[2];
         dim_arr[0] = offset/dims;
         dim_arr[1] = offset%dims;
         return dim_arr;
     }
+public:
+
+    uint64_t get_offset(const uint64_t& dimension, const uint64_t index){
+        return dimension*dims + index;
+    }
+    double* data;
 public:
     Matrix(uint64_t amount_to_archive = 5, uint64_t dimensions = num_dims) : timesteps_stored(amount_to_archive), dims(dimensions) {
         uint64_t num_elements = dims*timesteps_stored;

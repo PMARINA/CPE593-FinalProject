@@ -10,7 +10,7 @@ class Planetary_Object {
   static uint64_t timestamp;
   static double G;
   static double tolerance;
-  static double timestep;
+  static uint64_t timestep;
   uint64_t index;
   string name;
   double graphics_radius;
@@ -32,4 +32,5 @@ class Planetary_Object {
     delete[] velocity;
   }
   void predict_next_position();
+  // void update_acceleration(vector<Planetary_Object*>* bodies);
 };

@@ -23,6 +23,7 @@ void corrector(double &initial_value, uint64_t &step, double &fn0, double &fn1, 
     return_to = (initial_value + ((step/24.0) * (fn2 - 5.0*fn1 + 19.0*fn0 + 9.0*f1)));
 }
 
+#if 0
 void predictor_corrector(double* initial_value, double* deriv_array, uint64_t &timestep, double &return_to){
 //deriv_array contains fn-3, fn-2, fn-1, fn
 //initial_value contains starting yn
@@ -78,3 +79,4 @@ for (int i = 0; i < 2; i++){ //loop 3 times for x,y,z
     } 
 */
 }
+#endif
