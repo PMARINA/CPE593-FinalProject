@@ -25,7 +25,7 @@ double corrector(double y, double h, double f0, double f1, double f2, double f3)
 
 double predictor_corrector(){
     double t = 0; //initial time
-    double h = 0.2 //step
+    double h = 0.2; //step
     double f0 = 0, f1 = 0, f2 = 0, f3 = 0;
 
     // run function first 4 times for initial values
