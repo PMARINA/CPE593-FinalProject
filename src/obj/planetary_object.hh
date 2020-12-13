@@ -1,6 +1,7 @@
 #define CONFIG_PATH "../src/data_process/Reformatted_Input.txt"
 #include <cstdint>
 #include <string>
+#include  "matrix.cpp"
 
 using std::string;
 using std::vector;
@@ -19,7 +20,8 @@ class Planetary_Object {
   double obliquity_to_orbit;
   double mass;
   double* position;
-  double* velocity;
+  Matrix* velocity = new Matrix();
+  Matrix* acceleration = new Matrix();
 
  public:
   Planetary_Object(uint64_t index, string name, double graphics_radius,
