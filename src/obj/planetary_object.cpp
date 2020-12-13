@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-// #include "../math/gravity_equations_vectors.cpp"
+#include "../math/gravity_equations_vectors.cpp"
 // #include "../math/rkf45_implement.cpp"
 #include "../math/predictor_corrector.cpp"
 #include "../math/constants.cpp"
@@ -45,63 +45,73 @@ Planetary_Object::Planetary_Object(uint64_t index, string name, double graphics_
 
 //predictor(double &initial_value, uint64_t &step, double &fn0, double &fn1, double &fn2, double &fn3, double &return_to)
 //corrector(double &initial_value, uint64_t &step, double &fn0, double &fn1, double &fn2, double &f1, double &return_to)
-#if 0
-Planetary_Object::update_acceleration(vector<Planetary_Object*>* bodies){
-  // First step the time forward to avoid overwriting existing acceleration
-  // data (unsure if need to maintain, but won't hurt to have)
-  acceleration->stepForward();
-  // Allocate temporary vars.
-  double acceleration_this_dim, our_coord, their_coord, temp_acceleration;
-  for(uint64_t i = 0; i<num_dims; i++){
-    // assume 0 acceleration to start with...
-    acceleration_this_dim = 0;
-    // get the coordinate of position of the this object, as it's shared for
-    // all calculations with other planets...
-    this->position->retrieveAtPoint(i, 0, our_coord);
-    for(uint64_t j = 0; j<bodies->size(); j++){
-      if(this != bodies->at(j)){
-        bodies->at(j)->position->retrieveAtPoint(i, 0, their_coord);
-        gravitational_acceleration_component(this->mass, bodies->at(j)->mass, Planetary_Object::G, our_coord, their_coord, temp_acceleration);
-        acceleration_this_dim = temp_acceleration;
+void Planetary_Object::compute_accelerations(vector<Planetary_Object*>* planets){
+  // Store the forces_aggregate calculated while summing in this array.
+  double forces_aggregate[planets->size()];
+  // Calculation variables that will be set by retrieval functions...
+  double our_coord, their_coord, temp_force;
+  uint64_t zero = 0;
+  for (uint64_t i = 0; i < num_dims; i++)
+  {
+    memset(forces_aggregate, 0, sizeof(double)*planets->size());
+    for(uint64_t j = 0; j<planets->size(); j++){
+      planets->at(j)->position->retrieveAtPoint(i, zero, our_coord);
+      for(uint64_t k = j+1; k<planets->size(); k++){
+        planets->at(k)->position->retrieveAtPoint(i, zero, their_coord);
+        gravitational_force_component(planets->at(j)->mass, planets->at(k)->mass, Planetary_Object::G, our_coord, their_coord, temp_force);
+        forces_aggregate[j] += temp_force;
+        forces_aggregate[k] += temp_force;
       }
+      planets->at(j)->acceleration->stepForward();
+      forces_aggregate[j] /= planets->at(j)->mass;
+      planets->at(j)->acceleration->setAtPoint(i, zero, forces_aggregate[j]);
     }
-    acceleration_this_dim += temp_acceleration;
-    acceleration->setAtPoint(i,0, acceleration_this_dim);
   }
-#if 0
-  for(uint64_t i = 0; i<num_dims; i++){
-    
-    // assume 0 acceleration to start with...
-    acceleration_this_dim = 0;
-    // get the coordinate of position of the this object, as it's shared for
-    // all calculations with other planets...
-    this->position->retrieveAtPoint(i, 0, our_coord);
-    for(uint64_t j = 0; j<bodies->size(); j++){
-      if(this != bodies->at(j)){
-        bodies->at(j)->position->retrieveAtPoint(i, 0, their_coord);
-        gravitational_acceleration_component(this->mass, bodies->at(j)->mass, Planetary_Object::G, our_coord, their_coord, temp_acceleration);
-        acceleration_this_dim = temp_acceleration;
-      }
-    }
-    acceleration_this_dim += temp_acceleration;
-    acceleration->setAtPoint(i,0, acceleration_this_dim);
-  }
-#endif
 }
-#endif
+void Planetary_Object::predict_nth_order(uint64_t order_n){
+  Matrix* reffed_order = nullptr;
+  Matrix* next_order = nullptr;
+  if(order_n == 0)reffed_order = position;
+  else if (order_n == 1) reffed_order = velocity;
+  else if (order_n == 2) reffed_order = acceleration;
+  assert(reffed_order != nullptr);
 
-void Planetary_Object::predict_next_position(){
-  position->stepForward();
-  // method needs 4 velocities
-  double velocities[pc_num_derivs];
+  if(order_n == 0)next_order = velocity;
+  else if (order_n == 1) next_order = acceleration;
+  assert(next_order != nullptr);
+
+  reffed_order->stepForward();
+  // method needs 4 next_order_values
+  double next_order_values[pc_num_derivs];
   for (uint64_t i = 0; i < num_dims; i++)
   {
     for (uint64_t j = 0; j < pc_num_derivs; j++)
-      velocity->retrieveAtPoint(i, j, *(velocities + j));
-    predictor(position->data[position->get_offset(i, 1)], Planetary_Object::timestep, velocities[0], velocities[1], velocities[2], velocities[3], position->data[position->get_offset(i, 0)]);
+      next_order->retrieveAtPoint(i, j, *(next_order_values + j));
+    predictor(reffed_order->data[reffed_order->get_offset(i, 1)], Planetary_Object::timestep, next_order_values[0], next_order_values[1], next_order_values[2], next_order_values[3], reffed_order->data[reffed_order->get_offset(i, 0)]);
   }
 }
+void Planetary_Object::correct_nth_order(uint64_t order_n){
+  Matrix* reffed_order = nullptr;
+  Matrix* next_order = nullptr;
+  if(order_n == 0)reffed_order = position;
+  else if (order_n == 1) reffed_order = velocity;
+  else if (order_n == 2) reffed_order = acceleration;
+  assert(reffed_order != nullptr);
 
+  if(order_n == 0)next_order = velocity;
+  else if (order_n == 1) next_order = acceleration;
+  assert(next_order != nullptr);
+
+  reffed_order->stepForward();
+  // method needs 4 next_order_values
+  double next_order_values[pc_num_derivs];
+  for (uint64_t i = 0; i < num_dims; i++)
+  {
+    for (uint64_t j = 0; j < pc_num_derivs; j++)
+      next_order->retrieveAtPoint(i, j, *(next_order_values + j));
+    corrector(reffed_order->data[reffed_order->get_offset(i, 1)], Planetary_Object::timestep, next_order_values[1], next_order_values[2], next_order_values[3], next_order_values[0], reffed_order->data[reffed_order->get_offset(i, 0)]);
+  }
+}
 vector<Planetary_Object *> *Planetary_Object::read_config(string filepath)
 {
   FileReaderWriter frw(filepath);

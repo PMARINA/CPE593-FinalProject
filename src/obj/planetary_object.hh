@@ -31,6 +31,8 @@ class Planetary_Object {
     delete[] position;
     delete[] velocity;
   }
-  void predict_next_position();
+  void predict_nth_order(uint64_t order_n);
+  void correct_nth_order(uint64_t order_n);
+  static void compute_accelerations(vector<Planetary_Object*>* planets);
   // void update_acceleration(vector<Planetary_Object*>* bodies);
 };

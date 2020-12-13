@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "obj/planetary_object.hh"
-#include "math/gravity_equations_vectors.cpp"
 using std::cout;
 using std::endl;
 using std::vector;
@@ -19,6 +18,7 @@ int main()
   while (true)
   {
      /**
+      * Overall Predictor Corrector Algorithm
       * 1. Predict( p(n+1) given velocity matrix in each planet)
       * 2. Use gravity equations to get p'' given p(n+1) for each planet
       * 3. use correction alg C'(n+1)
@@ -28,41 +28,23 @@ int main()
     // Predict( p(n+1) given velocity matrix in each planet)
     for (int i = 0; i < planets->size(); i++)
     {
-      planets->at(i)->predict_next_position();
+      planets->at(i)->predict_nth_order(0);
     }
     
-    //Use gravity equations to get p'' given p(n+1) for each planet
+    // Use gravity equations to get p'' given p(n+1) for each planet
+    Planetary_Object::compute_accelerations(planets);
 
-    // Store the accelerations calculated while summing in this array.
-    double accelerations[planets->size()];
-    // Calculation variables that will be set by retrieval functions...
-    double our_coord, their_coord, temp_force;
-    uint64_t zero = 0;
-    for (uint64_t i = 0; i < num_dims; i++)
-    {
-      memset(accelerations, 0, sizeof(double)*planets->size());
-      for(uint64_t j = 0; j<planets->size(); j++){
-        planets->at(j)->position->retrieveAtPoint(i, zero, our_coord);
-        for(uint64_t k = j+1; k<planets->size(); k++){
-          planets->at(k)->position->retrieveAtPoint(i, zero, their_coord);
-          gravitational_force_component(planets->at(j)->mass, planets->at(k)->mass, Planetary_Object::G, our_coord, their_coord, temp_force);
-          accelerations[j] += temp_force/planets->at(j)->mass;
-          accelerations[k] += temp_force/planets->at(k)->mass;
-        }
-        planets->at(j)->acceleration->stepForward();
-        planets->at(j)->acceleration->setAtPoint(i, zero, accelerations[j]);
-      }
-      // planets->at(i)->update_acceleration(planets);
-    }
     for (int i = 0; i < planets->size(); i++)
-    {
+    { 
       //use correction alg C'(n+1)
+      planets->at(i)->correct_nth_order(1);
     }
     for (int i = 0; i < planets->size(); i++)
     {
       // Use correction alg C(n+1)
+      planets->at(i)->correct_nth_order(0);
     }
-    // increment timestamp by timestep
+    //TODO: increment timestamp by timestep
   }
 }
 
