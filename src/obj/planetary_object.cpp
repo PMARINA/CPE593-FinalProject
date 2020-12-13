@@ -1,7 +1,9 @@
 #include "planetary_object.hh"
-
 #include <iostream>
-
+#include "../math/gravity_equations_vectors.cpp"
+#include "../math/rkf45_implement.cpp"
+#include "../math/predictor_corrector.cpp"
+#include "../math/constants.cpp"
 #include "../res/FileReaderWriter.cpp"
 using std::cin;
 using std::cout;

@@ -1,8 +1,6 @@
-#define num_dims 3
 #define CONFIG_PATH "../src/data_process/Reformatted_Input.txt"
 #include <cstdint>
 #include <string>
-#include <vector>
 
 using std::string;
 using std::vector;
