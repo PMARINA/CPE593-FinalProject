@@ -1,11 +1,10 @@
 #define CONFIG_PATH "../src/data_process/Reformatted_Input.txt"
 #include <cstdint>
 #include <string>
+#include <vector>
 #include  "matrix.cpp"
-
 using std::string;
 using std::vector;
-
 class Planetary_Object {
  public:
   static uint64_t timestamp;

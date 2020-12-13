@@ -1,15 +1,17 @@
 #include "planetary_object.hh"
 #include <iostream>
+#include <vector>
 
-#include "../math/gravity_equations_vectors.cpp"
-#include "../math/rkf45_implement.cpp"
-#include "../math/predictor_corrector.cpp"
-#include "../math/constants.cpp"
+// #include "../math/gravity_equations_vectors.cpp"
+// #include "../math/rkf45_implement.cpp"
+// #include "../math/predictor_corrector.cpp"
+// #include "../math/constants.cpp"
 #include "../res/FileReaderWriter.cpp"
 
 using std::cin;
 using std::cout;
 using std::endl;
+using std::vector;
 
 uint64_t Planetary_Object::timestamp = 0;
 double Planetary_Object::G = 0;
@@ -30,12 +32,13 @@ Planetary_Object::Planetary_Object(uint64_t index, string name, double graphics_
   this->velocity = new Matrix();
   this->acceleration = new Matrix();
   // Assuming index 0 is the latest data. Index num_dims-1 is the stalest data.
-  for (int i = 0; i < num_dims; i++)
+  uint64_t fresh_data_index = 0;
+  for (uint64_t i = 0; i < num_dims; i++)
   {
     // dims = x, y, z...
     // index = # timesteps into the past...
-    this->position->setAtPoint(i, 0, position[i]);
-    this->velocity->setAtPoint(i, 0, velocity[i]);
+    this->position->setAtPoint(i, fresh_data_index, position[i]);
+    this->velocity->setAtPoint(i, fresh_data_index, velocity[i]);
   }
 }
 
@@ -85,7 +88,7 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath)
       a->emplace_back(new Planetary_Object(index, name, graphics_radius,
                                            rot_rate, obliquity_to_orbit, mass,
                                            position, velocity));
-#if 0
+      // #if 0
       cout << "Read planet" << endl;
       cout << "Planet index: " << index << endl;
       cout << "Planet Name:  " << name << endl;
@@ -95,7 +98,7 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath)
       cout << "Obl Orb:      " << obliquity_to_orbit << endl;
       cout << "Mass:         " << mass << endl;
       cin >> index;
-#endif
+      // #endif
       frw.in_file >> index;
     }
   }
