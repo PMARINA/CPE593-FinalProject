@@ -1,7 +1,7 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <cmath>
-#include "../obj/planetary_object.hh"
+#include "constants.cpp"
 
 using std::cout;
 using std::endl;
