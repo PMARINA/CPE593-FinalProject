@@ -19,26 +19,18 @@ class Planetary_Object {
   double rot_rate;
   double obliquity_to_orbit;
   double mass;
-  double* position;
-  Matrix* velocity = new Matrix();
-  Matrix* acceleration = new Matrix();
+  Matrix* position;     // Only first time step is init
+  Matrix* velocity;     // Only first time step is init
+  Matrix* acceleration; // going to be unitialized until done by main loop using RKF45
 
  public:
   Planetary_Object(uint64_t index, string name, double graphics_radius,
                    double rot_rate, double obliquity_to_orbit, double mass,
-                   double* position, double* velocity) {
-    this->index = index;
-    this->name = name;
-    this->graphics_radius = graphics_radius;
-    this->rot_rate = rot_rate;
-    this->obliquity_to_orbit = obliquity_to_orbit;
-    this->mass = mass;
-    this->position = position;
-    this->velocity = velocity;
-  }
+                   double* position, double* velocity);
   static vector<Planetary_Object*>* read_config(string filepath = CONFIG_PATH);
   ~Planetary_Object() {
     delete[] position;
     delete[] velocity;
   }
+  void predict_next_position();
 };

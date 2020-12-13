@@ -2,10 +2,13 @@
 #include <cstdint>
 #include <string>
 #include <string.h>
+
+#if 0
 #include <iostream>
 
 using std::cout;
 using std::endl;
+#endif
 
 using std::string;
 class Matrix {

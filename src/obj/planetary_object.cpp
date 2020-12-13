@@ -1,22 +1,49 @@
 #include "planetary_object.hh"
 #include <iostream>
+
 #include "../math/gravity_equations_vectors.cpp"
 #include "../math/rkf45_implement.cpp"
 #include "../math/predictor_corrector.cpp"
 #include "../math/constants.cpp"
 #include "../res/FileReaderWriter.cpp"
+
 using std::cin;
 using std::cout;
 using std::endl;
-// #include ""
+
 uint64_t Planetary_Object::timestamp = 0;
 double Planetary_Object::G = 0;
 double Planetary_Object::tolerance = 0;
 double Planetary_Object::timestep = 0;
-vector<Planetary_Object*>* Planetary_Object::read_config(string filepath) {
+
+Planetary_Object::Planetary_Object(uint64_t index, string name, double graphics_radius,
+                                   double rot_rate, double obliquity_to_orbit, double mass,
+                                   double *position, double *velocity)
+{
+  this->index = index;
+  this->name = name;
+  this->graphics_radius = graphics_radius;
+  this->rot_rate = rot_rate;
+  this->obliquity_to_orbit = obliquity_to_orbit;
+  this->mass = mass;
+  this->position = new Matrix();
+  this->velocity = new Matrix();
+  this->acceleration = new Matrix();
+  // Assuming index 0 is the latest data. Index num_dims-1 is the stalest data.
+  for (int i = 0; i < num_dims; i++)
+  {
+    // dims = x, y, z...
+    // index = # timesteps into the past...
+    this->position->setAtPoint(i, 0, position[i]);
+    this->velocity->setAtPoint(i, 0, velocity[i]);
+  }
+}
+
+vector<Planetary_Object *> *Planetary_Object::read_config(string filepath)
+{
   FileReaderWriter frw(filepath);
   // cout << "Got frw" << endl;
-  vector<Planetary_Object*>* a = new vector<Planetary_Object*>();
+  vector<Planetary_Object *> *a = new vector<Planetary_Object *>();
   // cout << "Vector made" << endl;
   frw.in_file >> Planetary_Object::timestamp;
   // cout << "timestamp" << endl;
@@ -35,20 +62,24 @@ vector<Planetary_Object*>* Planetary_Object::read_config(string filepath) {
   double obliquity_to_orbit;
   double mass;
   frw.in_file >> index;
-  while (!frw.in_file.eof()) {
+  while (!frw.in_file.eof())
+  {
     frw.in_file >> name;
     frw.in_file >> graphics_radius;
     frw.in_file >> radius;
     frw.in_file >> rot_rate;
     frw.in_file >> obliquity_to_orbit;
     frw.in_file >> mass;
-    if (!frw.in_file.eof()) {
-      double* position = new double[3];
-      double* velocity = new double[3];
-      for (int i = 0; i < num_dims; i++) {
+    if (!frw.in_file.eof())
+    {
+      double *position = new double[num_dims];
+      double *velocity = new double[num_dims];
+      for (int i = 0; i < num_dims; i++)
+      {
         frw.in_file >> position[i];
       }
-      for (int i = 0; i < num_dims; i++) {
+      for (int i = 0; i < num_dims; i++)
+      {
         frw.in_file >> velocity[i];
       }
       a->emplace_back(new Planetary_Object(index, name, graphics_radius,
