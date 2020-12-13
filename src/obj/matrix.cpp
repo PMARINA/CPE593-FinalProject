@@ -31,6 +31,9 @@ public:
         data = new double[num_elements];
         memset(data, 0, num_elements*sizeof(double));
     };
+    void stepForward(){
+      memmove(data+dims, data, (timesteps_stored-1)*dims*sizeof(double));
+    }
     void setAtPoint(uint64_t &dimension, uint64_t &index, double &input_data) {
         data[get_offset(dimension, index)] = input_data;
     }
