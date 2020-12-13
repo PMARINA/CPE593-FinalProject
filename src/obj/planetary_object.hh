@@ -1,10 +1,19 @@
 #define num_dims 3
+#define CONFIG_PATH "../src/data_process/Reformatted_Input.txt"
+#include <cstdint>
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 class Planetary_Object {
  public:
+  static uint64_t timestamp;
+  static double G;
+  static double tolerance;
+  static double timestep;
+  uint64_t index;
   string name;
   double graphics_radius;
   double radius;
@@ -15,9 +24,10 @@ class Planetary_Object {
   double* velocity;
 
  public:
-  Planetary_Object(string name, double graphics_radius, double rot_rate,
-                   double obliquity_to_orbit, double mass, double* position,
-                   double* velocity) {
+  Planetary_Object(uint64_t index, string name, double graphics_radius,
+                   double rot_rate, double obliquity_to_orbit, double mass,
+                   double* position, double* velocity) {
+    this->index = index;
     this->name = name;
     this->graphics_radius = graphics_radius;
     this->rot_rate = rot_rate;
@@ -26,6 +36,7 @@ class Planetary_Object {
     this->position = position;
     this->velocity = velocity;
   }
+  static vector<Planetary_Object*>* read_config(string filepath = CONFIG_PATH);
   ~Planetary_Object() {
     delete[] position;
     delete[] velocity;
