@@ -36,3 +36,6 @@ docs/*.*
 docs/Makefile
 !docs/*.pdf
 !docs/*.tex
+
+# Build Files
+build/
