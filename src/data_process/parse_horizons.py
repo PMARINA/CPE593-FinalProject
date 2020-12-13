@@ -32,7 +32,7 @@ https://docs.google.com/spreadsheets/d/10y0553157L4t-43h3ratr3Er87rziJQ7Q7Md4NY2
 """
 
 from os.path import exists
-from typing import List
+from typing import List, Union
 import json as storage_class
 from re import match, findall, DOTALL, IGNORECASE
 from glob import glob as find_files
@@ -133,13 +133,14 @@ def get_mass(lines: str) -> float:
     return mass
 
 
-def get_posix_timestamp(nasa_time_str: str) -> float:
+def get_posix_timestamp(nasa_time_str: str) -> int:
     nasa_time_str = findall(r"(?<=A\.D\.).*(?=TDB)", nasa_time_str)[0].strip()
     nasa_time_components = nasa_time_str.split(".")
     feed_time_str = nasa_time_components[0].strip().lower()
     dt = datetime.strptime(feed_time_str, "%Y-%b-%d %H:%M:%S")
     dt = dt + timedelta(microseconds=int(nasa_time_components[1].strip()))
     time_stamp = dt.replace(tzinfo=timezone.utc).timestamp()
+    time_stamp = int(time_stamp)
     if LOGGING_ENABLED:
         logger.debug(f"Timestamp: {time_stamp}")
     return time_stamp
@@ -169,7 +170,7 @@ def get_velocity_data(vel_data: str):
     return vel
 
 
-def get_time_pos_vel(lines: str) -> List[float]:
+def get_time_pos_vel(lines: str) -> List[Union[int, List[float]]]:
     data = findall(r"(?<=\$\$SOE).*(?=\$\$EOE)", lines, flags=DOTALL)[0].strip()
     data = data.split("\n")[0:3]
     time_data = data[0]
