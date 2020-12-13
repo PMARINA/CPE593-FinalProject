@@ -88,7 +88,7 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath)
       a->emplace_back(new Planetary_Object(index, name, graphics_radius,
                                            rot_rate, obliquity_to_orbit, mass,
                                            position, velocity));
-      // #if 0
+      #if 0
       cout << "Read planet" << endl;
       cout << "Planet index: " << index << endl;
       cout << "Planet Name:  " << name << endl;
@@ -98,7 +98,7 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath)
       cout << "Obl Orb:      " << obliquity_to_orbit << endl;
       cout << "Mass:         " << mass << endl;
       cin >> index;
-      // #endif
+      #endif
       frw.in_file >> index;
     }
   }

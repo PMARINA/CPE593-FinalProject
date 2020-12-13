@@ -38,11 +38,11 @@ int main()
   }
 }
 
-/*
+#if 0
 int main() {
   cout << "Starting" << endl;
   vector<Planetary_Object*>* planets = Planetary_Object::read_config();
   cout << "Finished" << endl;
   return 0;
 }
-*/
+#endif
