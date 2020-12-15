@@ -41,6 +41,7 @@ from math import sqrt
 
 #### Constants ########
 
+END_TIMESTAMP = 1608336000
 G_CONSTANT = 6.6743015e-11
 COMMON_GRAPHICS_RADIUS = 1
 TOLERANCE = 1
@@ -236,6 +237,7 @@ def generate_program_input():
                 first_object = False
                 global_timestamp = body_timestamp
                 out.write(f"{global_timestamp}\n")
+                out.write(f"{END_TIMESTAMP}\n")
                 out.write(f"{G_CONSTANT}\n")
                 out.write(f"{TOLERANCE}\n")
                 out.write(f"{TIMESTEP}\n")

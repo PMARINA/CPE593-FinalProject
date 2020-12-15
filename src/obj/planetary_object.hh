@@ -2,12 +2,14 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include  "matrix.cpp"
+
+#include "matrix.cpp"
 using std::string;
 using std::vector;
 class Planetary_Object {
  public:
   static uint64_t timestamp;
+  static uint64_t end_simulation_timestamp;
   static double G;
   static double tolerance;
   static uint64_t timestep;
@@ -18,9 +20,10 @@ class Planetary_Object {
   double rot_rate;
   double obliquity_to_orbit;
   double mass;
-  Matrix* position;     // Only first time step is init
-  Matrix* velocity;     // Only first time step is init
-  Matrix* acceleration; // going to be unitialized until done by main loop using RKF45
+  Matrix* position;      // Only first time step is init
+  Matrix* velocity;      // Only first time step is init
+  Matrix* acceleration;  // going to be unitialized until done by main loop
+                         // using RKF45
 
  public:
   Planetary_Object(uint64_t index, string name, double graphics_radius,
