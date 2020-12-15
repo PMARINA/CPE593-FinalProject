@@ -7,7 +7,7 @@
 // #include "../math/rkf45_implement.cpp"
 #include "../math/constants.cpp"
 #include "../math/predictor_corrector.cpp"
-#include "../res/FileReaderWriter.cpp"
+// #include "../res/FileReaderWriter.cpp"
 
 using std::cin;
 using std::cout;
@@ -20,6 +20,7 @@ double Planetary_Object::G = 0;
 double Planetary_Object::tolerance = 0;
 uint64_t *dim_arr = new uint64_t[2];
 uint64_t Planetary_Object::timestep = 0;
+FileReaderWriter *Planetary_Object::frw = nullptr;
 
 Planetary_Object::Planetary_Object(uint64_t index, string name,
                                    double graphics_radius, double rot_rate,
@@ -132,18 +133,18 @@ void Planetary_Object::correct_nth_order(uint64_t order_n) {
   }
 }
 vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
-  FileReaderWriter frw(filepath);
+    Planetary_Object::frw = new FileReaderWriter(filepath);
   // cout << "Got frw" << endl;
   vector<Planetary_Object *> *a = new vector<Planetary_Object *>();
   // cout << "Vector made" << endl;
-  frw.in_file >> Planetary_Object::timestamp;
-  frw.infile >> Planetary_Object::end_simulation_timestamp;
+  frw->in_file >> Planetary_Object::timestamp;
+  frw->in_file >> Planetary_Object::end_simulation_timestamp;
   // cout << "timestamp" << endl;
-  frw.in_file >> Planetary_Object::G;
+  frw->in_file >> Planetary_Object::G;
   // cout << "G" << endl;
-  frw.in_file >> Planetary_Object::tolerance;
+  frw->in_file >> Planetary_Object::tolerance;
   // cout << "tolerance" << endl;
-  frw.in_file >> Planetary_Object::timestep;
+  frw->in_file >> Planetary_Object::timestep;
   // cout << "timestep" << endl;
   // cin >> timestep;
   string name;
@@ -153,22 +154,22 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
   double rot_rate;
   double obliquity_to_orbit;
   double mass;
-  frw.in_file >> index;
-  while (!frw.in_file.eof()) {
-    frw.in_file >> name;
-    frw.in_file >> graphics_radius;
-    frw.in_file >> radius;
-    frw.in_file >> rot_rate;
-    frw.in_file >> obliquity_to_orbit;
-    frw.in_file >> mass;
-    if (!frw.in_file.eof()) {
+  frw->in_file >> index;
+  while (!frw->in_file.eof()) {
+    frw->in_file >> name;
+    frw->in_file >> graphics_radius;
+    frw->in_file >> radius;
+    frw->in_file >> rot_rate;
+    frw->in_file >> obliquity_to_orbit;
+    frw->in_file >> mass;
+    if (!frw->in_file.eof()) {
       double *position = new double[num_dims];
       double *velocity = new double[num_dims];
       for (int i = 0; i < num_dims; i++) {
-        frw.in_file >> position[i];
+        frw->in_file >> position[i];
       }
       for (int i = 0; i < num_dims; i++) {
-        frw.in_file >> velocity[i];
+        frw->in_file >> velocity[i];
       }
       a->emplace_back(new Planetary_Object(index, name, graphics_radius,
                                            rot_rate, obliquity_to_orbit, mass,
@@ -184,8 +185,23 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
       cout << "Mass:         " << mass << endl;
       cin >> index;
 #endif
-      frw.in_file >> index;
+      frw->in_file >> index;
     }
   }
   return a;
+}
+void Planetary_Object::dump_data(vector<Planetary_Object *> *planets) {
+  for (uint64_t i = 0; i < planets->size(); i++) {
+    *(frw->out_file) << planets->at(i)->index << ": ";
+    *(frw->out_file) << planets->at(i)->position->data[0] << " ";
+    *(frw->out_file) << planets->at(i)->position->data[1] << " ";
+    *(frw->out_file) << planets->at(i)->position->data[2] << "\n";
+  }
+  *(frw->out_file) << "\n";
+  // *(frw->out_file)->flush();
+}
+
+void Planetary_Object::close() {
+  Planetary_Object::frw->flush_writer();
+  delete frw;
 }

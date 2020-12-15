@@ -31,7 +31,7 @@ class FileReaderWriter {
   string in_file_name = "";
   string out_file_name = "";
   ifstream in_file;
-  ofstream out_file;
+  ofstream* out_file;
 
   FileReaderWriter(string input_file_name = "", string output_file_name = "") {
     if (input_file_name == "") {
@@ -42,7 +42,7 @@ class FileReaderWriter {
     }
     this->in_file_name = input_file_name;
     this->in_file = ifstream(input_file_name, std::ios::binary);
-    this->out_file = ofstream(output_file_name);
+    this->out_file = new ofstream(output_file_name);
     std::locale x(std::locale::classic(), new my_ctype);
     in_file.imbue(x);
   }
@@ -57,17 +57,17 @@ class FileReaderWriter {
                std::istreambuf_iterator<char>());
     return str;
   }
-  void write(string s) { out_file << s; }
-  void flush_writer() { out_file.flush(); }
+  // void write(string s) { out_file << s; }
+  void flush_writer() { out_file->flush(); }
   ~FileReaderWriter() {
     in_file.close();
-    out_file.close();
+    out_file->close();
   }
 };
-// An example of using the FileReaderWriter class.
-void copy_file() {
-  FileReaderWriter *frw = new FileReaderWriter();
-  string s = frw->read_all();
-  frw->write(s);
-  delete frw;
-}
+// // An example of using the FileReaderWriter class.
+// void copy_file() {
+//   FileReaderWriter *frw = new FileReaderWriter();
+//   string s = frw->read_all();
+//   frw->write(s);
+//   delete frw;
+// }
