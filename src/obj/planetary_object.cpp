@@ -133,7 +133,7 @@ void Planetary_Object::correct_nth_order(uint64_t order_n) {
   }
 }
 vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
-    Planetary_Object::frw = new FileReaderWriter(filepath);
+  Planetary_Object::frw = new FileReaderWriter(filepath);
   // cout << "Got frw" << endl;
   vector<Planetary_Object *> *a = new vector<Planetary_Object *>();
   // cout << "Vector made" << endl;
@@ -167,10 +167,14 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
       double *velocity = new double[num_dims];
       for (int i = 0; i < num_dims; i++) {
         frw->in_file >> position[i];
+        cout << position[i] << '\t';
       }
+      cout << "\n";
       for (int i = 0; i < num_dims; i++) {
         frw->in_file >> velocity[i];
+        cout << velocity[i] << '\t';
       }
+      cout << "\n";
       a->emplace_back(new Planetary_Object(index, name, graphics_radius,
                                            rot_rate, obliquity_to_orbit, mass,
                                            position, velocity));
@@ -193,9 +197,18 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
 void Planetary_Object::dump_data(vector<Planetary_Object *> *planets) {
   for (uint64_t i = 0; i < planets->size(); i++) {
     *(frw->out_file) << planets->at(i)->index << ": ";
-    *(frw->out_file) << planets->at(i)->position->data[0] << " ";
-    *(frw->out_file) << planets->at(i)->position->data[1] << " ";
-    *(frw->out_file) << planets->at(i)->position->data[2] << "\n";
+    *(frw->out_file)
+        << planets->at(i)
+               ->position->data[planets->at(i)->position->get_offset(0, 0)]
+        << " ";
+    *(frw->out_file)
+        << planets->at(i)
+               ->position->data[planets->at(i)->position->get_offset(1, 0)]
+        << " ";
+    *(frw->out_file)
+        << planets->at(i)
+               ->position->data[planets->at(i)->position->get_offset(2, 0)]
+        << "\n";
   }
   *(frw->out_file) << "\n";
   // *(frw->out_file)->flush();

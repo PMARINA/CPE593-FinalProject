@@ -12,7 +12,7 @@ using std::vector;
 
 void simulate_RKF_then_PC() {
   vector<Planetary_Object *> *planets = Planetary_Object::read_config();
-
+  Planetary_Object::dump_data(planets);
   // TODO: RKF45 first 5 vel (only 4 required)
   Planetary_Object *temp;
   uint64_t index;
@@ -20,9 +20,6 @@ void simulate_RKF_then_PC() {
   for (int j = 0; j < 4; j++) {
     for (int i = 0; i < planets->size(); i++) {
       temp = planets->at(i);
-      temp->velocity->stepForward();
-      temp->acceleration->stepForward();
-      temp->position->stepForward();
       for (int k = 0; k < num_dims; k++) {
         index = temp->velocity->get_offset(k, 0);
         old_index = temp->velocity->get_offset(k, 1);
@@ -33,6 +30,9 @@ void simulate_RKF_then_PC() {
             temp->timestep, temp->velocity->data[index],
             temp->position->data[old_index], temp->position->data[index]);
       }
+      temp->velocity->stepForward();
+      temp->acceleration->stepForward();
+      temp->position->stepForward();
     }
   }
   while (Planetary_Object::timestamp <
