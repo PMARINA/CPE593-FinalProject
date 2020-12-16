@@ -47,8 +47,8 @@
 \usepackage{amsthm, amsmath, amssymb} % Mathematical typesetting
 \usepackage{marvosym, wasysym} % More symbols
 \usepackage{float} % Improved interface for floating objects
-\usepackage[final, colorlinks = true, 
-            linkcolor = black, 
+\usepackage[final, colorlinks = true,
+            linkcolor = black,
             citecolor = black,
             urlcolor = black]{hyperref} % For hyperlinks in the PDF
 \usepackage{graphicx, multicol} % Enhanced support for graphics
@@ -157,7 +157,7 @@ For the purposes of this article, we will be assuming that we are attempting to 
 % \[\target\]
 Additionally, although this equation, \(y(x)\), is only a function of one variable, these methods can be applied to multi-dimensional equations.
 \subsection{First Order RK}
-The first order of the RK class is simply the Euler approximation to the equation. 
+The first order of the RK class is simply the Euler approximation to the equation.
 \[\target \approx y(x_0) + \Delta_x * y'(x_0) \text{, where } \Delta_x = x_1 - x_0\]
 \begin{figure}[H]
   \centering
@@ -177,8 +177,8 @@ The first order of the RK class is simply the Euler approximation to the equatio
 \caption{\(\currEq\) with first derivative shown, and the approximation at \(x_1 = 3\), given \(x_0 = 2.5\).}
 \end{figure}
 
-Although the inaccuracy in this can be fairly large unless a sufficiently small timestep (\(\Delta_x\)) is used, there is a large benefit in terms of computational power required to compute this result. 
-To calculate this normally, one would have to compute first, \(x-3\) and store that in a register. 
+Although the inaccuracy in this can be fairly large unless a sufficiently small timestep (\(\Delta_x\)) is used, there is a large benefit in terms of computational power required to compute this result.
+To calculate this normally, one would have to compute first, \(x-3\) and store that in a register.
 Next, compute \((x-3)^5\), during which the other powers will be computed.
 1 computation for each of the following operations produces 8 operations to evaluate the given equation at a value.
 \begin{enumerate}
@@ -194,7 +194,7 @@ Next, compute \((x-3)^5\), during which the other powers will be computed.
 
 Meanwhile, using the first order RK, and a first order taylor series, we are able to approximate the value of \(y(x_1)\) based on \(y(x_0)\) by doing the following.
 \begin{enumerate}
-  \item Given \(y(x_0)\)... 
+  \item Given \(y(x_0)\)...
   \item \todo[inline]{How do we calculate the derivative?}
   \item \todo[inline]{Is this only more efficient not for higher order polynomials, but rather more complex equations, such as when sin/cos or fractions with polynomials everywhere exist?}
   \item Somehow calculate the derivative

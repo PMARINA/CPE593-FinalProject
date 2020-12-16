@@ -5,7 +5,7 @@ Notes:
     You may have to change the regex's if this happens, or otherwise edit the
     input-files to have the parameters (I know a mass is missing in at least
     one of the planets' data files).
-3)  Set the constants correctly to match your application, as specified in 
+3)  Set the constants correctly to match your application, as specified in
 3)  `python3 parse_horizons.py`
 4)  `Reformatted_Input.txt` is the output file.
 """
@@ -247,9 +247,7 @@ def generate_program_input():
             bodies.append(data)
         # Reverse = Descending...
         # We sort the bodies by their distance from the center (0,0,0)
-        bodies.sort(
-            key=lambda l: sqrt(sum([pow(float(x), 2) for x in l[-1][1]])), reverse=False
-        )
+        bodies.sort(key=lambda l: sqrt(sum([pow(float(x), 2) for x in l[-1][1]])), reverse=False)
         first_object = True
         global_timestamp = None
         counter = 0
@@ -273,7 +271,9 @@ def generate_program_input():
                     exit(1)
             pos_str = ",".join(body[-1][1])
             vel_str = ",".join(body[-1][2])
-            data = f"{body[0]},{body[2]},{body[1]},{body[3]},{body[4]},{body[5]},{pos_str},{vel_str}"
+            data = (
+                f"{body[0]},{body[2]},{body[1]},{body[3]},{body[4]},{body[5]},{pos_str},{vel_str}"
+            )
             out.write(f"{counter},{data}\n")
             counter += 1
 

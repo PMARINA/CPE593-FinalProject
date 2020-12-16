@@ -9,7 +9,7 @@
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
-    filecolor=magenta,      
+    filecolor=magenta,
     urlcolor=blue,
 }
 
@@ -24,7 +24,7 @@
 \tableofcontents
 
 \section{Introduction}
-This group consists of Nicholas Dodd, Pridhvi Myneni, and Joey Rupert. We are working on the RK45 and Predictor-Corrector methods of numerical estimation. Our \href{https://github.com/PMARINA/CPE593-FinalProject}{GitHub repository}  contains both the documentation and code for our project. 
+This group consists of Nicholas Dodd, Pridhvi Myneni, and Joey Rupert. We are working on the RK45 and Predictor-Corrector methods of numerical estimation. Our \href{https://github.com/PMARINA/CPE593-FinalProject}{GitHub repository}  contains both the documentation and code for our project.
 
 \section{Project Proposal}
 \subsection{Group Members}
@@ -72,7 +72,7 @@ Once you have this, you can try with solar system. First try, just do planets ou
 
 (Obviously, the earth affects the moon and vice versa because the moon is really close, so this is not a full solution)
 
-If you want to use the assumption that every orbit is circular, average perihelion and aphelion. Pick a random starting angle around the circle. You will have to calculate velocity for circular orbit or elliptical orbits 
+If you want to use the assumption that every orbit is circular, average perihelion and aphelion. Pick a random starting angle around the circle. You will have to calculate velocity for circular orbit or elliptical orbits
 
 Then try every planet, every major moon. Should be fun.
 
@@ -95,26 +95,26 @@ More to be added as research continues
 \section{Week 1 Report}
 \subsection{Repository Information}
 \subsubsection{Repository Organization}
-Our \href{https://github.com/PMARINA/CPE593-FinalProject}{GitHub repository} was setup this past week with our organizational structure, a root directory \texttt{docs} for our documentation, and \texttt{src} (not yet created) for our codebase. 
+Our \href{https://github.com/PMARINA/CPE593-FinalProject}{GitHub repository} was setup this past week with our organizational structure, a root directory \texttt{docs} for our documentation, and \texttt{src} (not yet created) for our codebase.
 
 \subsubsection{Repository Access}
 Since our final project is not being attempted by another group,  and our work on this project could aid us in our job/internship searches, we are making our repository public. Therefore, its contents, as well as its history, should be viewable by Professor Kruger and our TA, Fan Yang.
 
 \subsection{Progress}
 \subsubsection{Nicholas Dodd}
-As per the GitHub repository commit history, Nick wrote \href{https://github.com/PMARINA/CPE593-FinalProject/blob/f8c679ad0c435e2d89354a87e111404e5477b096/Predictor\%20Corrector.pdf}{an introduction to Predictor-Corrector methods}, as well as \href{https://github.com/PMARINA/CPE593-FinalProject/blob/f8c679ad0c435e2d89354a87e111404e5477b096/Simple\%20Approach\%20For\%20Stepping\%20Time\%20Using\%20Euler.pdf}{an approach for time-stepping} in a proposed preliminary implementation of the Euclidean method for numerical estimation. 
+As per the GitHub repository commit history, Nick wrote \href{https://github.com/PMARINA/CPE593-FinalProject/blob/f8c679ad0c435e2d89354a87e111404e5477b096/Predictor\%20Corrector.pdf}{an introduction to Predictor-Corrector methods}, as well as \href{https://github.com/PMARINA/CPE593-FinalProject/blob/f8c679ad0c435e2d89354a87e111404e5477b096/Simple\%20Approach\%20For\%20Stepping\%20Time\%20Using\%20Euler.pdf}{an approach for time-stepping} in a proposed preliminary implementation of the Euclidean method for numerical estimation.
 
 \subsubsection{Pridhvi Myneni}
-I reorganized the repository structure to match the current system. 
+I reorganized the repository structure to match the current system.
 
-Additionally, I started learning how the RK45 system works and wrote part of an introduction to the Runge Kutta class of solvers. I wrote and illustrated an example of the first order solution, the Euclidean estimation, and got stuck attempting to compare the efficiency of computing the exact solution to my proposed hypothetical situation, against the Euclidean estimation. 
+Additionally, I started learning how the RK45 system works and wrote part of an introduction to the Runge Kutta class of solvers. I wrote and illustrated an example of the first order solution, the Euclidean estimation, and got stuck attempting to compare the efficiency of computing the exact solution to my proposed hypothetical situation, against the Euclidean estimation.
 
 Specifically, how do we calculate the derivative of a function for a computer? Do we use the Taylor Series approximation? Can a computer do that? I understand that \texttt{CORDIC} might be the solution; however, I have yet to read up on it, and if this means that polynomials are not more efficient to estimate(?). My introduction can be viewed \href{https://github.com/PMARINA/CPE593-FinalProject/blob/9ab5c29673f9862f02e62eb5c33648d52db2cf95/docs/RK45.pdf}{here}.
 
-Although Joey had already written a separate \href{https://github.com/PMARINA/CPE593-FinalProject/blob/cccc07ca08b7014ca53ca4ae4ae105185df95d7e/RKF45_Algorithm.pdf}{introduction to RK45}, I did not understand the equations and had to review the material for myself, as this was the part of the project I was responsible for coding in terms of the breakdown of work in the project proposal. 
+Although Joey had already written a separate \href{https://github.com/PMARINA/CPE593-FinalProject/blob/cccc07ca08b7014ca53ca4ae4ae105185df95d7e/RKF45_Algorithm.pdf}{introduction to RK45}, I did not understand the equations and had to review the material for myself, as this was the part of the project I was responsible for coding in terms of the breakdown of work in the project proposal.
 
 \subsubsection{R. Joey Rupert}
-As per the GitHub repository commit history, Joey worked on a separate \href{https://github.com/PMARINA/CPE593-FinalProject/blob/cccc07ca08b7014ca53ca4ae4ae105185df95d7e/RKF45_Algorithm.pdf}{introduction to RK45}, which covered what the algorithm was used for and some equations. 
+As per the GitHub repository commit history, Joey worked on a separate \href{https://github.com/PMARINA/CPE593-FinalProject/blob/cccc07ca08b7014ca53ca4ae4ae105185df95d7e/RKF45_Algorithm.pdf}{introduction to RK45}, which covered what the algorithm was used for and some equations.
 
 [Authors note: I didn't understand the equations, so I am likely understating Joey's contributions.]
 % here be dragons...

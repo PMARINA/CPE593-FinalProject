@@ -27,7 +27,7 @@ $(EULER_TEST): $(BUILD)/predictor_corrector_Euler_test.o
 $(BUILD)/predictor_corrector_Euler_test.o: $(MATH)/predictor_corrector_Euler_test.cpp
 	g++ -c -g3 $< -o $@
 
-make_build: 
+make_build:
 	mkdir -p $(BUILD)
 
 clean:

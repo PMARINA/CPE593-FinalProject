@@ -37,11 +37,11 @@
 }
 
 %% Common btree macros
-\newcommand{\btreelink}[2]{% #1: src node; #2: dest node; 
+\newcommand{\btreelink}[2]{% #1: src node; #2: dest node;
   \draw[btlink] ([yshift=3pt] #1.south) -- (#2-b.north);
 }
 
-\newcommand{\btreelinknorth}[2]{% #1: src node; #2: dest node; 
+\newcommand{\btreelinknorth}[2]{% #1: src node; #2: dest node;
   \draw[btlink] ([yshift=3pt] #1.south) -- (#2.north);
 }
 
@@ -117,7 +117,7 @@
 %  \begin{center}
 %    \scalebox{0.7}{
 %      \begin{tikzpicture}
-%        % 
+%        %
 %        \btreeinodefour{root}{13}{17}{24}{30};
 %        \xyshift{-40mm}{-20mm}{\btreelnodefour{n1}{2}{3}{5}{7}}
 %        \xyshift{-0mm}{-20mm}{\btreelnodefour{n2}{14}{16}{}{}}
