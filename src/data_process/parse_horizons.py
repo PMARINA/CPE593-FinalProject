@@ -45,7 +45,7 @@ END_TIMESTAMP = 1608336000
 G_CONSTANT = 6.6743015e-11
 COMMON_GRAPHICS_RADIUS = 1
 TOLERANCE = 1
-TIMESTEP = -1  # -1 for adaptive...
+TIMESTEP = 100  # -1 for adaptive...
 
 # Visual/Debugging Parameters:
 # Note that with these disabled, there will be no output...
@@ -54,6 +54,26 @@ TIMESTEP = -1  # -1 for adaptive...
 LOGGING_ENABLED = True
 LOGGING_SUCCESS = True
 
+# PHYSICAL CONSTANTS:
+# Danger: changing these may result in inaccurate simulation data processing.
+# Meters <-> Astronomical Units
+_METERS_IN_AU = 1.496e11
+AU_TO_METERS = lambda x: x * _METERS_IN_AU
+METERS_TO_AU = lambda x: x / _METERS_IN_AU
+# kilometers <-> meters
+_METERS_IN_KILOMETER = 1000
+METERS_TO_KILOMETERS = lambda x: x / _METERS_IN_KILOMETER
+KILOMETERS_TO_METERS = lambda x: x * _METERS_IN_KILOMETER
+
+# Solar Masses <-> Kilograms
+_KG_IN_SOL_MASS = 1.98847e30
+SOL_MASS_TO_KG = lambda x: x * _KG_IN_SOL_MASS
+KG_TO_SOL_MASS = lambda x: x / _KG_IN_SOL_MASS
+
+# Days <-> seconds
+_SECONDS_IN_DAY = 86400
+SECONDS_TO_DAYS = lambda x: x / _SECONDS_IN_DAY
+DAYS_TO_SECONDS = lambda x: x * _SECONDS_IN_DAY
 #### End Constants ####
 
 # pip3 install loguru
@@ -82,9 +102,11 @@ def get_obj_radius(lines: str) -> float:
     obj_radius: float = float(obj_radius_str)
     if LOGGING_ENABLED:
         logger.debug(f"Obj Radius: {obj_radius} km")
-    return obj_radius
+    obj_radius_standardized_units = KILOMETERS_TO_METERS(obj_radius)
+    return obj_radius_standardized_units
 
 
+# TODO: Come up with a standard for rotation: not currently being used so ignoring.
 def get_rot_rate(lines: str) -> float:
     # ex Rot. Rate (rad/s)        = 0.00007292115
     line_items: List[str] = findall(r"Rot.*?.*?=.+?\n", lines, flags=IGNORECASE)
@@ -97,6 +119,7 @@ def get_rot_rate(lines: str) -> float:
     return rot_rate
 
 
+# TODO: Standardize rotation units.
 def get_obliquity_to_orbit(lines: str) -> float:
     # ex Obliquity to orbit, deg  = 23.4392911
     lines = lines.replace("'", "")
@@ -106,10 +129,6 @@ def get_obliquity_to_orbit(lines: str) -> float:
     if LOGGING_ENABLED:
         logger.debug(f"Obj Obliquity to Orbit: {obliquity} deg")
     return obliquity
-
-
-def get_amu_from_kg(mass: float):
-    return mass / 1.98892e30
 
 
 def get_mass(lines: str) -> float:
@@ -128,10 +147,9 @@ def get_mass(lines: str) -> float:
     mul_pow: float = float(findall(r"(?<=\^).*?\s", multiplier_str)[0].strip())
     multiplier: float = pow(mul_base, mul_pow)
     mass_kg: float = float(base_mass_str) * multiplier
-    mass: float = get_amu_from_kg(mass_kg)
     if LOGGING_ENABLED:
-        logger.debug(f"Obj Mass: {mass} Astronomical Mass Units")
-    return mass
+        logger.debug(f"Obj Mass: {mass_kg} kg")
+    return mass_kg
 
 
 def get_posix_timestamp(nasa_time_str: str) -> int:
@@ -153,7 +171,11 @@ def pos_vel_intermediate(xyzstr: str, preface="") -> List[float]:
         dim = f"{preface}{dim}"
         s = xyzstr[xyzstr.find(dim) :] + "\n"
         coord = findall(r"(?<==).+?\s", s)[0].strip()
-        position.append(coord)
+        if preface == "":
+            coord = AU_TO_METERS(float(coord.strip()))
+        elif preface == "V":
+            coord = AU_TO_METERS(float(coord.strip())) / _SECONDS_IN_DAY
+        position.append(str(coord))
     return position
 
 
