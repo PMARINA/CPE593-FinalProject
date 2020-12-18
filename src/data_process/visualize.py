@@ -67,7 +67,7 @@ def alert_deviation(last_coordinates, sim_in_file=SIMULATION_INPUT_FILE):
 
     start_timestamp = int(lines[0])
     end_timestamp = int(lines[1])
-    num_days = math.ceil((end_timestamp - start_timestamp) / _SECONDS_IN_DAY)
+    num_days = 1  # math.ceil((end_timestamp - start_timestamp) / _SECONDS_IN_DAY)+1
 
     sim_positions_planets = lines[5:]
     num_bodies_in_sim = len(sim_positions_planets)
@@ -109,7 +109,7 @@ def draw_planet(coords):
         xs.append([])
         ys.append([])
         zs.append([])
-    for interval in [coords[0]]:  # coords:
+    for interval in [coords[0], coords[-1]]:  # coords:
         for i in range(len(interval)):
             xs[i].append(interval[i][0] / _METERS_IN_AU)
             ys[i].append(interval[i][1] / _METERS_IN_AU)
@@ -119,13 +119,15 @@ def draw_planet(coords):
     for i in range(len(coords[1])):
         if i == 0:
             ax.scatter(xs[i], ys[i], zs[i], color="yellow")
-        elif i == 2:
+        elif i == 4:
             ax.scatter(xs[i], ys[i], zs[i], color="blue")
         elif i == 3:
             ax.scatter(xs[i], ys[i], zs[i], color="green")
         else:
-            pass
-            # ax.scatter(xs[i], ys[i], zs[i], color ="black")
+            if i < 0.5 * len(coords[1]):
+                ax.scatter(xs[i], ys[i], zs[i], color="black")
+            else:
+                ax.scatter(xs[i], ys[i], zs[i], color="orange")
     plt.show()
 
 
@@ -135,7 +137,7 @@ def main():
     logger.debug(f"We have {len(grouped_coordinates)} timesteps")
     logger.debug(f"Each of which has {len(grouped_coordinates[-1])} bodies")
     logger.debug(f"Each of which has {len(grouped_coordinates[-1][-1])} coordinates per point")
-    # alert_deviation(grouped_coordinates[-1])
+    alert_deviation(grouped_coordinates[0])
     draw_planet(grouped_coordinates)
     breakpoint
 

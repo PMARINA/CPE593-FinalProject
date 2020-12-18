@@ -25,7 +25,7 @@ FileReaderWriter *Planetary_Object::frw = nullptr;
 Planetary_Object::Planetary_Object(uint64_t index, string name,
                                    double graphics_radius, double rot_rate,
                                    double obliquity_to_orbit, double mass,
-                                   double *position, double *velocity) {
+                                   double *p, double *v) {
   this->index = index;
   this->name = name;
   this->graphics_radius = graphics_radius;
@@ -40,8 +40,8 @@ Planetary_Object::Planetary_Object(uint64_t index, string name,
   for (uint64_t i = 0; i < num_dims; i++) {
     // dims = x, y, z...
     // index = # timesteps into the past...
-    this->position->setAtPoint(i, fresh_data_index, position[i]);
-    this->velocity->setAtPoint(i, fresh_data_index, velocity[i]);
+    this->position->setAtPoint(i, fresh_data_index, p[i]);
+    this->velocity->setAtPoint(i, fresh_data_index, v[i]);
   }
 }
 
@@ -155,6 +155,7 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
   double obliquity_to_orbit;
   double mass;
   frw->in_file >> index;
+  uint64_t zero = 0;
   while (!frw->in_file.eof()) {
     frw->in_file >> name;
     frw->in_file >> graphics_radius;
@@ -163,22 +164,26 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
     frw->in_file >> obliquity_to_orbit;
     frw->in_file >> mass;
     if (!frw->in_file.eof()) {
+      Matrix *p = new Matrix();
+      Matrix *v = new Matrix();
       double *position = new double[num_dims];
       double *velocity = new double[num_dims];
-      for (int i = 0; i < num_dims; i++) {
+      for (uint64_t i = 0; i < num_dims; i++) {
         frw->in_file >> position[i];
+        p->setAtPoint(i, zero, position[i]);
         cout << position[i] << '\t';
       }
       cout << "\n";
-      for (int i = 0; i < num_dims; i++) {
+      for (uint64_t i = 0; i < num_dims; i++) {
         frw->in_file >> velocity[i];
+        v->setAtPoint(i, zero, velocity[i]);
         cout << velocity[i] << '\t';
       }
       cout << "\n";
       a->emplace_back(new Planetary_Object(index, name, graphics_radius,
                                            rot_rate, obliquity_to_orbit, mass,
                                            position, velocity));
-#if 0
+      // #if 0
       cout << "Read planet" << endl;
       cout << "Planet index: " << index << endl;
       cout << "Planet Name:  " << name << endl;
@@ -187,8 +192,8 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
       cout << "Rot_rate:     " << rot_rate << endl;
       cout << "Obl Orb:      " << obliquity_to_orbit << endl;
       cout << "Mass:         " << mass << endl;
-      cin >> index;
-#endif
+      // cin >> index;
+      // #endif
       frw->in_file >> index;
     }
   }

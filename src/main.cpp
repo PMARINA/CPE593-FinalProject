@@ -18,11 +18,9 @@ void simulate_RKF_then_PC() {
   uint64_t index;
   uint64_t old_index;
   for (int j = 0; j < 4; j++) {
+    Planetary_Object::compute_accelerations(planets);
     for (int i = 0; i < planets->size(); i++) {
       temp = planets->at(i);
-      temp->velocity->stepForward();
-      temp->acceleration->stepForward();
-      temp->position->stepForward();
       for (int k = 0; k < num_dims; k++) {
         index = temp->velocity->get_offset(k, 0);
         old_index = temp->velocity->get_offset(k, 1);
@@ -33,8 +31,12 @@ void simulate_RKF_then_PC() {
             temp->timestep, temp->velocity->data[index],
             temp->position->data[old_index], temp->position->data[index]);
       }
+      temp->velocity->stepForward();
+      temp->acceleration->stepForward();
+      temp->position->stepForward();
     }
   }
+  Planetary_Object::compute_accelerations(planets);
   while (Planetary_Object::timestamp <
          Planetary_Object::end_simulation_timestamp) {
     Planetary_Object::dump_data(planets);
