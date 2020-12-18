@@ -102,7 +102,7 @@ void RKF45_fifth_order_timestep_coefficient(uint64_t &timestep, double &deriv,
                                             double &return_coefficient_to) {
   double error, fifth, fourth;
   RKF45_integral_estimate_fifth_order(timestep, deriv, initial_value, fifth);
-  RKF45_integral_estimate_fourth_order(timestep, deriv, initial_value, fifth);
+  RKF45_integral_estimate_fourth_order(timestep, deriv, initial_value, fourth);
   error = fifth - fourth;
   return_coefficient_to = pow((tolerance * timestep) / (2 * abs(error)), 0.25);
 };
