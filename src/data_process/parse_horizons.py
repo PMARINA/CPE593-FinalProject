@@ -40,12 +40,12 @@ from datetime import datetime, timedelta, timezone
 from math import sqrt
 
 #### Constants ########
-
-END_TIMESTAMP = 1608336000
-G_CONSTANT = 6.6743015e-11
+START_TIMESTAMP = 0
+END_TIMESTAMP = 1
+G_CONSTANT = 6.6743015e-11 / 86400  # for days instead of seconds
 COMMON_GRAPHICS_RADIUS = 1
 TOLERANCE = 1
-TIMESTEP = 100  # -1 for adaptive...
+TIMESTEP = 0.000001  # -1 for adaptive...
 
 # Visual/Debugging Parameters:
 # Note that with these disabled, there will be no output...
@@ -193,19 +193,34 @@ def get_velocity_data(vel_data: str):
     return vel
 
 
-def get_time_pos_vel(lines: str) -> List[Union[int, List[float]]]:
+def get_time_pos_vel(lines: str, num_timesteps: int = 5) -> List[Union[int, List[float]]]:
     data = findall(r"(?<=\$\$SOE).*(?=\$\$EOE)", lines, flags=DOTALL)[0].strip()
-    data = data.split("\n")[0:3]
-    time_data = data[0]
-    position_data = data[1]
-    vel_data = data[2]
-    ts = get_posix_timestamp(time_data)
-    position_data = get_position_data(position_data)
-    velocity_data = get_velocity_data(vel_data)
-    return ts, position_data, velocity_data
+    ret_arr = []
+    pos_accumulator = []
+    vel_accumulator = []
+    one_timestep = False
+    data_found = data.split("\n")
+    for i in range(num_timesteps):
+        offset = 3 * i
+        data = data_found[0 + offset : 3 + offset]
+        position_data = data[1]
+        vel_data = data[2]
+        if not one_timestep:
+            time_data = data[0]
+            ts = get_posix_timestamp(time_data)
+            one_timestep = True
+            ret_arr.append(ts)
+        position_data = get_position_data(position_data)
+        velocity_data = get_velocity_data(vel_data)
+        velocity_data = [str(float(x) / _SECONDS_IN_DAY) for x in velocity_data]
+        pos_accumulator.extend(position_data)
+        vel_accumulator.extend(velocity_data)
+    ret_arr.append(pos_accumulator)
+    ret_arr.append(vel_accumulator)
+    return ret_arr
 
 
-def process_file(filepath: str, counter: int = -1) -> None:
+def process_file(filepath: str, num_timesteps_to_include: int = 5) -> None:
     if LOGGING_ENABLED:
         logger.debug(f"About to parse: {filepath}")
     lines: List[str] = []
@@ -220,7 +235,7 @@ def process_file(filepath: str, counter: int = -1) -> None:
     rot_rate = get_rot_rate(concatted_lines)
     obliquity_to_orbit = get_obliquity_to_orbit(concatted_lines)
     mass = get_mass(concatted_lines)
-    time_pos_vel_arr = get_time_pos_vel(concatted_lines)
+    time_pos_vel_arr = get_time_pos_vel(concatted_lines, num_timesteps_to_include)
     data = [
         obj_name,
         obj_radius,
@@ -247,7 +262,9 @@ def generate_program_input():
             bodies.append(data)
         # Reverse = Descending...
         # We sort the bodies by their distance from the center (0,0,0)
-        bodies.sort(key=lambda l: sqrt(sum([pow(float(x), 2) for x in l[-1][1]])), reverse=False)
+        bodies.sort(
+            key=lambda l: sqrt(sum([pow(float(x), 2) for x in l[-1][1][0:3]])), reverse=False
+        )
         first_object = True
         global_timestamp = None
         counter = 0
@@ -256,7 +273,7 @@ def generate_program_input():
             if first_object:
                 first_object = False
                 global_timestamp = body_timestamp
-                out.write(f"{global_timestamp}\n")
+                out.write(f"{START_TIMESTAMP}\n")
                 out.write(f"{END_TIMESTAMP}\n")
                 out.write(f"{G_CONSTANT}\n")
                 out.write(f"{TOLERANCE}\n")
@@ -278,7 +295,7 @@ def generate_program_input():
             counter += 1
 
 
-# @logger.catch
+@logger.catch
 def main() -> None:
     input_files: List[str] = find_files("horizons_results*.txt")
     if LOGGING_SUCCESS:

@@ -67,7 +67,7 @@ def alert_deviation(last_coordinates, sim_in_file=SIMULATION_INPUT_FILE):
 
     start_timestamp = int(lines[0])
     end_timestamp = int(lines[1])
-    num_days = 1  # math.ceil((end_timestamp - start_timestamp) / _SECONDS_IN_DAY)+1
+    num_days = 6  # math.ceil((end_timestamp - start_timestamp) / _SECONDS_IN_DAY)+1
 
     sim_positions_planets = lines[5:]
     num_bodies_in_sim = len(sim_positions_planets)
@@ -96,8 +96,25 @@ def alert_deviation(last_coordinates, sim_in_file=SIMULATION_INPUT_FILE):
         logger.debug(planet)
         logger.debug(f"NASA Had:")
         print(body_dict[planet])
+        str_to_parse = body_dict[planet]
+        str_to_parse = str_to_parse.replace("X", "")
+        str_to_parse = str_to_parse.replace("Y", "")
+        str_to_parse = str_to_parse.replace("Z", "")
+        # logger.error(str_to_parse)
+        parse = str_to_parse.split("=")[1:]
+        parse = [float(x.strip()) for x in parse]
         logger.debug(f"You had:")
         [print("{:e}".format(x / _METERS_IN_AU)) for x in last_coordinates[i]]
+        from math import sqrt
+
+        distance = sqrt(
+            sum([pow((last_coordinates[i][j] / _METERS_IN_AU - parse[j]), 2) for j in range(3)])
+        )
+        error = 0
+        for j in range(len(parse)):
+            error += abs((parse[j] - last_coordinates[i][j] / _METERS_IN_AU) / parse[j] * 100)
+        d_str = "{:e}".format(distance * _METERS_IN_AU)
+        logger.success(f"Distance = {d_str} meters, with {error}% error in coordinates.")
         input("Ok to Proceed? ")
 
 
@@ -124,10 +141,11 @@ def draw_planet(coords):
         elif i == 3:
             ax.scatter(xs[i], ys[i], zs[i], color="green")
         else:
-            if i < 0.5 * len(coords[1]):
+            if True:  # i < 0.5 * len(coords[1]):
                 ax.scatter(xs[i], ys[i], zs[i], color="black")
             else:
-                ax.scatter(xs[i], ys[i], zs[i], color="orange")
+                pass
+            # ax.scatter(xs[i], ys[i], zs[i], color="orange")
     plt.show()
 
 

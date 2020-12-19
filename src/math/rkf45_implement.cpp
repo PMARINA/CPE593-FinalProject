@@ -29,30 +29,28 @@ using std::endl;
 
 // Equations used internally within the integral estimates.
 
-double RKF45k1(uint64_t &timestep, double &deriv) {
-  return (timestep * deriv);
-};
-double RKF45k2(uint64_t &timestep, double &deriv, double &initialValue) {
-  uint64_t timestep_new = (.25 * timestep);
+double RKF45k1(double &timestep, double &deriv) { return (timestep * deriv); };
+double RKF45k2(double &timestep, double &deriv, double &initialValue) {
+  double timestep_new = (.25 * timestep);
   double deriv_est = ((.25 * RKF45k1(timestep_new, deriv)));
   return (initialValue + deriv_est);
 };
-double RKF45k3(uint64_t &timestep, double &deriv, double &initialValue) {
-  uint64_t timestep_new = ((3.0 / 8.0) * timestep);
+double RKF45k3(double &timestep, double &deriv, double &initialValue) {
+  double timestep_new = ((3.0 / 8.0) * timestep);
   double deriv_est =
       ((3.0 / 32.0) * RKF45k1(timestep_new, deriv)) +
       ((9.0 / 32.0) * RKF45k2(timestep_new, deriv, initialValue));
   return (initialValue + deriv_est);
 };
-double RKF45k4(uint64_t &timestep, double &deriv, double &initialValue) {
-  uint64_t timestep_new = ((12.0 / 13.0) * timestep);
+double RKF45k4(double &timestep, double &deriv, double &initialValue) {
+  double timestep_new = ((12.0 / 13.0) * timestep);
   double deriv_est =
       ((1932.0 / 2197.0) * RKF45k1(timestep_new, deriv)) -
       ((7200.0 / 2197.0) * RKF45k2(timestep_new, deriv, initialValue)) +
       ((7296.0 / 2197.0) * RKF45k3(timestep_new, deriv, initialValue));
   return (initialValue + deriv_est);
 };
-double RKF45k5(uint64_t &timestep, double &deriv, double &initialValue) {
+double RKF45k5(double &timestep, double &deriv, double &initialValue) {
   double deriv_est =
       ((439.0 / 216.0) * RKF45k1(timestep, deriv)) -
       (8.0 * RKF45k2(timestep, deriv, initialValue)) +
@@ -60,8 +58,8 @@ double RKF45k5(uint64_t &timestep, double &deriv, double &initialValue) {
       ((845.0 / 4104.0) * RKF45k4(timestep, deriv, initialValue));
   return (initialValue + deriv_est);
 };
-double RKF45k6(uint64_t &timestep, double &deriv, double &initialValue) {
-  uint64_t timestep_new = .5 * timestep;
+double RKF45k6(double &timestep, double &deriv, double &initialValue) {
+  double timestep_new = .5 * timestep;
   double deriv_est =
       ((-8.0 / 27.0) * RKF45k1(timestep_new, deriv)) +
       (2.0 * RKF45k2(timestep_new, deriv, initialValue)) -
@@ -73,7 +71,7 @@ double RKF45k6(uint64_t &timestep, double &deriv, double &initialValue) {
 
 // The integral estimates themselves.
 
-void RKF45_integral_estimate_fourth_order(uint64_t &timestep, double &deriv,
+void RKF45_integral_estimate_fourth_order(double &timestep, double &deriv,
                                           double &initial_value,
                                           double &return_result_to) {
   return_result_to =
@@ -83,7 +81,7 @@ void RKF45_integral_estimate_fourth_order(uint64_t &timestep, double &deriv,
        (.2 * RKF45k5(timestep, deriv, initial_value)));
 };
 
-void RKF45_integral_estimate_fifth_order(uint64_t &timestep, double &deriv,
+void RKF45_integral_estimate_fifth_order(double &timestep, double &deriv,
                                          double &initial_value,
                                          double &return_result_to) {
   return_result_to =
@@ -96,7 +94,7 @@ void RKF45_integral_estimate_fifth_order(uint64_t &timestep, double &deriv,
 
 // Function to return adaptive timestep coefficient.
 
-void RKF45_fifth_order_timestep_coefficient(uint64_t &timestep, double &deriv,
+void RKF45_fifth_order_timestep_coefficient(double &timestep, double &deriv,
                                             double &initial_value,
                                             double &tolerance,
                                             double &return_coefficient_to) {

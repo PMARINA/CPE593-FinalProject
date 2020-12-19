@@ -16,30 +16,29 @@ void simulate_RKF_then_PC() {
   Planetary_Object *temp;
   uint64_t index;
   uint64_t old_index;
-  for (int j = 0; j < 4; j++) {
-    Planetary_Object::compute_accelerations(planets);
-    for (int i = 0; i < planets->size(); i++) {
-      temp = planets->at(i);
-      temp->velocity->stepForward();
-      temp->acceleration->stepForward();
-      temp->position->stepForward();
-      for (int k = 0; k < num_dims; k++) {
-        index = temp->velocity->get_offset(k, 0);
-        old_index = temp->velocity->get_offset(k, 1);
-        RKF45_integral_estimate_fourth_order(
-            temp->timestep, temp->acceleration->data[index],
-            temp->velocity->data[old_index], temp->velocity->data[index]);
-        RKF45_integral_estimate_fourth_order(
-            temp->timestep, temp->velocity->data[index],
-            temp->position->data[old_index], temp->position->data[index]);
-      }
-    }
-    Planetary_Object::dump_data(planets);
-  }
-  Planetary_Object::compute_accelerations(planets);
+  // for (int j = 0; j < 4; j++) {
+  //   Planetary_Object::compute_accelerations(planets);
+  //   for (int i = 0; i < planets->size(); i++) {
+  //     temp = planets->at(i);
+  //     temp->velocity->stepForward();
+  //     temp->acceleration->stepForward();
+  //     temp->position->stepForward();
+  //     for (int k = 0; k < num_dims; k++) {
+  //       index = temp->velocity->get_offset(k, 0);
+  //       old_index = temp->velocity->get_offset(k, 1);
+  //       RKF45_integral_estimate_fourth_order(
+  //           temp->timestep, temp->acceleration->data[index],
+  //           temp->velocity->data[old_index], temp->velocity->data[index]);
+  //       RKF45_integral_estimate_fourth_order(
+  //           temp->timestep, temp->velocity->data[index],
+  //           temp->position->data[old_index], temp->position->data[index]);
+  //     }
+  //   }
+  //   Planetary_Object::dump_data(planets);
+  // }
+  // Planetary_Object::compute_accelerations(planets);
   while (Planetary_Object::timestamp <
          Planetary_Object::end_simulation_timestamp) {
-    Planetary_Object::dump_data(planets);
     /**
      * Overall Predictor Corrector Algorithm
      * 1. Predict( p(n+1) given velocity matrix in each planet)
@@ -65,6 +64,7 @@ void simulate_RKF_then_PC() {
       planets->at(i)->correct_nth_order(0);
     }
     Planetary_Object::timestamp += Planetary_Object::timestep;
+    Planetary_Object::dump_data(planets);
   }
 };
 

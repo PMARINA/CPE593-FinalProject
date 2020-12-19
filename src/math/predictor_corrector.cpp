@@ -17,7 +17,7 @@ and it will calculate the next step value
 time t
 } */
 
-void predictor(double &initial_value, uint64_t &step, double &fn0, double &fn1,
+void predictor(double &initial_value, double &step, double &fn0, double &fn1,
                double &fn2, double &fn3,
                double &return_to) {  // predictor: fn0 = fn, fn1 = fn-1, fn2 =
                                      // fn-2, fn3 = fn-3
@@ -26,7 +26,7 @@ void predictor(double &initial_value, uint64_t &step, double &fn0, double &fn1,
        ((step / 24.0) * (-9.0 * fn3 + 37.0 * fn2 - 59.0 * fn1 + 55.0 * fn0)));
 }
 
-void corrector(double &initial_value, uint64_t &step, double &fn0, double &fn1,
+void corrector(double &initial_value, double &step, double &fn0, double &fn1,
                double &fn2, double &f1,
                double &return_to) {  // corrector: fn0 = fn, fn1 = fn-1, fn2 =
                                      // fn-2, f1 = fn+1
@@ -35,7 +35,7 @@ void corrector(double &initial_value, uint64_t &step, double &fn0, double &fn1,
 }
 
 #if 0
-void predictor_corrector(double* initial_value, double* deriv_array, uint64_t &timestep, double &return_to){
+void predictor_corrector(double* initial_value, double* deriv_array, double &timestep, double &return_to){
 //deriv_array contains fn-3, fn-2, fn-1, fn
 //initial_value contains starting yn
 

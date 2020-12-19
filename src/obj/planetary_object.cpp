@@ -14,35 +14,35 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-uint64_t Planetary_Object::timestamp = 0;
-uint64_t Planetary_Object::end_simulation_timestamp = 0;
+double Planetary_Object::timestamp = 0;
+double Planetary_Object::end_simulation_timestamp = 0;
 double Planetary_Object::G = 0;
 double Planetary_Object::tolerance = 0;
 uint64_t *dim_arr = new uint64_t[2];
-uint64_t Planetary_Object::timestep = 0;
+double Planetary_Object::timestep = 0;
 FileReaderWriter *Planetary_Object::frw = nullptr;
 
 Planetary_Object::Planetary_Object(uint64_t index, string name,
                                    double graphics_radius, double rot_rate,
                                    double obliquity_to_orbit, double mass,
-                                   double *p, double *v) {
+                                   Matrix *p, Matrix *v) {
   this->index = index;
   this->name = name;
   this->graphics_radius = graphics_radius;
   this->rot_rate = rot_rate;
   this->obliquity_to_orbit = obliquity_to_orbit;
   this->mass = mass;
-  this->position = new Matrix();
-  this->velocity = new Matrix();
   this->acceleration = new Matrix();
+  this->position = p;
+  this->velocity = v;
   // Assuming index 0 is the latest data. Index num_dims-1 is the stalest data.
-  uint64_t fresh_data_index = 0;
-  for (uint64_t i = 0; i < num_dims; i++) {
-    // dims = x, y, z...
-    // index = # timesteps into the past...
-    this->position->setAtPoint(i, fresh_data_index, p[i]);
-    this->velocity->setAtPoint(i, fresh_data_index, v[i]);
-  }
+  // uint64_t fresh_data_index = 0;
+  // for (uint64_t i = 0; i < num_dims; i++) {
+  //   // dims = x, y, z...
+  //   // index = # timesteps into the past...
+  //   this->position->setAtPoint(i, fresh_data_index, p[i]);
+  //   this->velocity->setAtPoint(i, fresh_data_index, v[i]);
+  // }
 }
 
 // predictor(double &initial_value, uint64_t &step, double &fn0, double &fn1,
@@ -50,18 +50,18 @@ Planetary_Object::Planetary_Object(uint64_t index, string name,
 // uint64_t &step, double &fn0, double &fn1, double &fn2, double &f1, double
 // &return_to)
 void Planetary_Object::compute_accelerations(
-    vector<Planetary_Object *> *planets) {
+    vector<Planetary_Object *> *planets, uint64_t timestep_number) {
   // Store the forces_aggregate calculated while summing in this array.
   double forces_aggregate[planets->size()];
   // Calculation variables that will be set by retrieval functions...
   double our_coord, their_coord, temp_force;
-  uint64_t zero = 0;
   for (uint64_t i = 0; i < num_dims; i++) {
     memset(forces_aggregate, 0, sizeof(double) * planets->size());
     for (uint64_t j = 0; j < planets->size(); j++) {
-      planets->at(j)->position->retrieveAtPoint(i, zero, our_coord);
+      planets->at(j)->position->retrieveAtPoint(i, timestep_number, our_coord);
       for (uint64_t k = j + 1; k < planets->size(); k++) {
-        planets->at(k)->position->retrieveAtPoint(i, zero, their_coord);
+        planets->at(k)->position->retrieveAtPoint(i, timestep_number,
+                                                  their_coord);
         gravitational_force_component(planets->at(j)->mass,
                                       planets->at(k)->mass, Planetary_Object::G,
                                       our_coord, their_coord, temp_force);
@@ -70,7 +70,8 @@ void Planetary_Object::compute_accelerations(
       }
       planets->at(j)->acceleration->stepForward();
       forces_aggregate[j] /= planets->at(j)->mass;
-      planets->at(j)->acceleration->setAtPoint(i, zero, forces_aggregate[j]);
+      planets->at(j)->acceleration->setAtPoint(i, timestep_number,
+                                               forces_aggregate[j]);
     }
   }
 }
@@ -166,23 +167,27 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
     if (!frw->in_file.eof()) {
       Matrix *p = new Matrix();
       Matrix *v = new Matrix();
-      double *position = new double[num_dims];
-      double *velocity = new double[num_dims];
-      for (uint64_t i = 0; i < num_dims; i++) {
-        frw->in_file >> position[i];
-        p->setAtPoint(i, zero, position[i]);
-        cout << position[i] << '\t';
+      double temp_being_read_in = 0.0;
+      for (int j = 0; j < 5; j++) {
+        for (uint64_t i = 0; i < num_dims; i++) {
+          frw->in_file >> temp_being_read_in;
+          p->setAtPoint(i, zero, temp_being_read_in);
+          cout << temp_being_read_in << '\t';
+        }
+        p->stepForward();
       }
       cout << "\n";
-      for (uint64_t i = 0; i < num_dims; i++) {
-        frw->in_file >> velocity[i];
-        v->setAtPoint(i, zero, velocity[i]);
-        cout << velocity[i] << '\t';
+      for (int j = 0; j < 5; j++) {
+        for (uint64_t i = 0; i < num_dims; i++) {
+          frw->in_file >> temp_being_read_in;
+          v->setAtPoint(i, zero, temp_being_read_in);
+          cout << temp_being_read_in << '\t';
+        }
+        v->stepForward();
       }
       cout << "\n";
-      a->emplace_back(new Planetary_Object(index, name, graphics_radius,
-                                           rot_rate, obliquity_to_orbit, mass,
-                                           position, velocity));
+      a->push_back(new Planetary_Object(index, name, graphics_radius, rot_rate,
+                                        obliquity_to_orbit, mass, p, v));
       // #if 0
       cout << "Read planet" << endl;
       cout << "Planet index: " << index << endl;
@@ -195,6 +200,9 @@ vector<Planetary_Object *> *Planetary_Object::read_config(string filepath) {
       // cin >> index;
       // #endif
       frw->in_file >> index;
+    }
+    for (int i = 0; i < 5; i++) {
+      compute_accelerations(a, i);
     }
   }
   return a;
