@@ -137,7 +137,7 @@ def main():
     logger.debug(f"We have {len(grouped_coordinates)} timesteps")
     logger.debug(f"Each of which has {len(grouped_coordinates[-1])} bodies")
     logger.debug(f"Each of which has {len(grouped_coordinates[-1][-1])} coordinates per point")
-    alert_deviation(grouped_coordinates[0])
+    alert_deviation(grouped_coordinates[-1])
     draw_planet(grouped_coordinates)
     breakpoint
 
